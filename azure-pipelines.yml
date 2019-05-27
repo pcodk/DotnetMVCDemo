@@ -1,0 +1,27 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- master
+
+pool:
+  vmImage: 'ubuntu-16.04'
+
+variables:
+  dockerId: sampensiontest  # Replace with your Docker ID for Docker Hub or the admin user name for the Azure Container Registry
+  imageName: dotnetcore-mvc  # Replace with the name of the image you want to publish
+  dockerUsername: SampensionTest
+
+steps:
+- script: |
+    echo Build docker container
+    docker build -t $(dockerId).azurecr.io/$(imageName) -f Dockerfile .
+    echo $pswd | docker login $(dockerId).azurecr.io -u$(dockerUsername) --password-stdin
+    docker push $(dockerId).azurecr.io/$(imageName):latest
+  displayName: 'Build and push docker container'
+  env:
+    pswd: $(dockerPassword)
+
+
